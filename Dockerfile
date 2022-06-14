@@ -28,7 +28,7 @@ FROM python:3.9-slim-bullseye
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      gpg && \
+      gpg dirmngr && \
     apt-get clean -y
 
 COPY --from=builder --chown=1001:0 /opt/venv /opt/venv

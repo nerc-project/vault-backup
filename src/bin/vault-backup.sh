@@ -1,6 +1,6 @@
 #!/bin/bash
-set -x
 
+DEBUG=${DEBUG:-"false"}
 BACKUP_DIR=${BACKUP_DIR:-/backups}
 BACKUP_ROTATE=${BACKUP_ROTATE:-6}
 VAULT_ADDR=${VAULT_ADDR:-""}
@@ -15,6 +15,9 @@ GPG_KEYSERVER=${GPG_KEYSERVER:-"https://keys.openpgp.org"}
 GPG_KEY_ID=${GPG_KEY_ID:-""}
 GPG_RECIPIENT=${GPG_RECIPIENT:-""}
 GNUPGHOME=${GNUPGHOME:-"$HOME/.gnupg"}
+
+
+[[ "${DEBUG}" =~ (1|true) ]] && set -x
 
 
 function gpg_run() {

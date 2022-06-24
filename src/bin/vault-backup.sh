@@ -26,11 +26,13 @@ function gpg_run() {
 
 
 function gpg_fetch_pub_key() {
+  echo ">>> Fetching GPG key ${GPG_KEY_ID} from ${GPG_KEYSERVER}"
   gpg_run --keyserver "${GPG_KEYSERVER}" --recv-keys "${GPG_KEY_ID}"
 }
 
 
 function gpg_import_pub_key() {
+  echo ">>> Importing GPG pub key from environment"
   echo "${GPG_PUB_KEY}" | gpg_run --import
   gpg_run --list-keys
 }
@@ -47,6 +49,7 @@ function gpg_encrypt() {
 
 
 function backup_vault() {
+  echo ">>> Backing up all vault secrets to GPG-encrypted file"
   timestamp=$(date +%Y%m%d%H%M%S)
   safe export -a / | gpg_encrypt
 }
@@ -63,6 +66,7 @@ function retention() {
 
 
 function sync_backups_to_s3() {
+  echo ">>> Syncing vault backups to ${S3_BUCKET_URI} (endpoint: ${S3_ENDPOINT})"
   aws --endpoint-url "${S3_ENDPOINT}" s3 sync --delete "${BACKUP_DIR}" "${S3_BUCKET_URI}"
 }
 

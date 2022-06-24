@@ -18,38 +18,38 @@ spec:
                       name: vault-unseal-keys
                       key: vault-root
                 - name: VAULT_ADDR
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: vault_addr
                 - name: S3_ENDPOINT
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: s3_endpoint
                 - name: S3_BUCKET_URI
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: s3_bucket_uri
                 - name: GPG_PUB_KEY
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: gpg_pub_key
                 - name: GPG_RECIPIENT
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: gpg_recipient
                 - name: BACKUP_ROTATE
-                  $patch: replace
                   valueFrom:
+                    $patch: replace
                     secretKeyRef:
                       name: vault-backup
                       key: backup_rotate

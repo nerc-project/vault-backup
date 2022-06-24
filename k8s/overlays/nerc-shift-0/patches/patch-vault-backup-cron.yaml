@@ -1,0 +1,62 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-backup
+  namespace: vault
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: vault-backup
+              env:
+                - name: VAULT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: vault-unseal-keys
+                      key: vault-root
+                - name: VAULT_ADDR
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: vault_addr
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: s3_endpoint
+                - name: S3_BUCKET_URI
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: s3_bucket_uri
+                - name: GPG_PUB_KEY
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: gpg_pub_key
+                - name: GPG_RECIPIENT
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: gpg_recipient
+                - name: BACKUP_ROTATE
+                  valueFrom:
+                    $patch: replace
+                    secretKeyRef:
+                      name: vault-backup
+                      key: backup_rotate
+          volumes:
+            - name: vault-backup-cacert
+              secret:
+                secretName: vault-tls
+                items:
+                  - key: 'ca.crt'
+                    path: 'vault_ca.crt'

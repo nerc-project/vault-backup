@@ -1,0 +1,9 @@
+---
+namespace: default
+resources:
+  - ../../base
+  - secrets
+  - pvc.yaml
+
+patchesStrategicMerge:
+  - patches/patch-vault-backup-cron.yaml

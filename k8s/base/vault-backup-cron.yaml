@@ -1,0 +1,95 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-backup
+  namespace: vault
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+          containers:
+            - name: vault-backup
+              image: ghcr.io/nerc-project/vault-backup:main
+              imagePullPolicy: Always
+              env:
+                - name: HOME
+                  value: '/tmp'
+                - name: VAULT_ADDR
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: vault_addr
+                - name: VAULT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: vault-backup
+                      key: vault_token
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: s3_endpoint
+                - name: S3_BUCKET_URI
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: s3_bucket_uri
+                - name: GPG_ENABLE_PUB_KEY_IMPORT
+                  value: 'true'
+                - name: GPG_PUB_KEY
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: gpg_pub_key
+                - name: GPG_RECIPIENT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: gpg_recipient
+                - name: BACKUP_ROTATE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: vault-backup
+                      key: backup_rotate
+                - name: BACKUP_DIR
+                  value: '/backups'
+                - name: VAULT_CACERT
+                  value: '/tmp/vault_ca.crt'
+                - name: AWSCLI_CREDS
+                  value: '/tmp/.aws/credentials'
+              volumeMounts:
+                - name: vault-backup
+                  mountPath: "/backups"
+                - name: vault-backup-cacert
+                  mountPath: "/tmp/vault_ca.crt"
+                  subPath: 'vault_ca.crt'
+                - name: vault-backup-awscli-creds
+                  mountPath: "/tmp/.aws/credentials"
+                  subPath: 'credentials'
+          volumes:
+            - name: vault-backup
+              persistentVolumeClaim:
+                claimName: vault-backup
+            - name: vault-backup-cacert
+              secret:
+                secretName: vault-backup
+                items:
+                  - key: 'vault_ca_crt'
+                    path: 'vault_ca.crt'
+                defaultMode: 0400
+            - name: vault-backup-awscli-creds
+              secret:
+                secretName: vault-backup
+                items:
+                  - key: 'aws_credentials'
+                    path: 'credentials'
+                defaultMode: 0400
